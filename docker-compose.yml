@@ -1,0 +1,49 @@
+services:
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    env_file:
+      - ./env/common.env
+      - ./env/jellyfin.env
+    volumes:
+      - /mnt/dell_hdd/media:/media
+      - ./data/jellyfin/config:/config
+      - ./data/jellyfin/cache:/cache
+    ports:
+      - "8096:8096"
+    restart: unless-stopped
+
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    container_name: transmission
+    env_file:
+      - ./env/common.env
+      - ./env/transmission.env
+    volumes:
+      - ./data/transmission/config:/config
+      - /mnt/dell_hdd/media/downloads:/downloads
+      - /mnt/dell_hdd/media:/media
+    ports:
+      - "9091:9091"
+      - "51413:51413"
+      - "51413:51413/udp"
+    restart: unless-stopped
+
+  samba:
+    image: dperson/samba
+    container_name: samba
+    env_file:
+      - ./env/common.env
+      - ./.env
+    volumes:
+      - /mnt/dell_hdd:/mount
+      - ./data/samba:/config
+    ports:
+      - "137:137/udp"
+      - "138:138/udp"
+      - "139:139/tcp"
+      - "445:445/tcp"
+    restart: unless-stopped
+    command: >
+      -u "${SAMBA_USER};${SAMBA_PASS}"
+      -s "dell_hdd;/mount;yes;no;no;all;none"
