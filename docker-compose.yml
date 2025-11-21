@@ -115,6 +115,19 @@ services:
       - ${DB_DATA_LOCATION}:/var/lib/postgresql/data
     shm_size: 128mb
     restart: unless-stopped
+  stirling-pdf:
+    image: docker.stirlingpdf.com/stirlingtools/stirling-pdf:latest
+    ports:
+      - '8080:8080'
+    volumes:
+      - ./data/StirlingPDF/trainingData:/usr/share/tessdata # Required for extra OCR languages
+      - ./data/StirlingPDF/extraConfigs:/configs
+      - ./data/StirlingPDF/customFiles:/customFiles/
+      - /home/akash/logs/StirlingPDF/logs:/logs/
+      - ./data/StirlingPDF/pipeline:/pipeline/
+    environment:
+      - DISABLE_ADDITIONAL_FEATURES=false
+      - LANGS=en_GB
 
 volumes:
   model-cache:
